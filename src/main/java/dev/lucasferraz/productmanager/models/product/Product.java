@@ -48,4 +48,12 @@ public class Product {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
+    public Product(String name, String description, BigDecimal price, int stockQuantity, Category category) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.stockQuantity = stockQuantity;
+        this.category = category;
+    }
+
 }
