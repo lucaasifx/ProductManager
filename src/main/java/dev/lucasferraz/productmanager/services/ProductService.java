@@ -24,7 +24,7 @@ public class ProductService {
 
     public ProductResponseDTO getProductById(UUID id) {
         Product product = productRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Produto não encontrado")
+                () -> new ResourceNotFoundException(String.format("Produto com id %s not found", id))
         );
         return ProductResponseDTO.from(product);
     }
@@ -34,7 +34,7 @@ public class ProductService {
 //    Persistir o produto e mapear para ProductResponseDTO.
     public ProductResponseDTO addProduct(ProductRequestDTO productRequestDTO) {
         Category category = categoryRepository.findById(productRequestDTO.categoryId()).orElseThrow(
-                () -> new ResourceNotFoundException("Recurso não encontrado")
+                () -> new ResourceNotFoundException(String.format("Categoria com id %s não encontrada", productRequestDTO.categoryId()))
         );
         if (!category.isActive()) {
             throw new BusinessRuleException(String.format("Não foi possível criar o produto, categoria %s está inativa.", category.getName()));
