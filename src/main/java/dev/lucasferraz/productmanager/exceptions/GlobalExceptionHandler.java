@@ -1,5 +1,6 @@
 package dev.lucasferraz.productmanager.exceptions;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -27,6 +28,15 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 "Um ou mais campos estão inválidos");
         problemDetail.setTitle("Erro de validação");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ProblemDetail handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                "Já existe um registro cadastrado com essas informações");
+        problemDetail.setTitle("Conflito de dados");
         return problemDetail;
     }
 }

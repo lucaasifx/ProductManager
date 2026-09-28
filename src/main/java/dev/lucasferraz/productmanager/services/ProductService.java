@@ -2,7 +2,7 @@ package dev.lucasferraz.productmanager.services;
 
 import dev.lucasferraz.productmanager.exceptions.BusinessRuleException;
 import dev.lucasferraz.productmanager.exceptions.ResourceNotFoundException;
-import dev.lucasferraz.productmanager.models.Category;
+import dev.lucasferraz.productmanager.models.category.Category;
 import dev.lucasferraz.productmanager.models.product.Product;
 import dev.lucasferraz.productmanager.models.product.ProductRequestDTO;
 import dev.lucasferraz.productmanager.models.product.ProductResponseDTO;
@@ -57,8 +57,7 @@ public class ProductService {
                 productRequestDTO.stockQuantity(),
                 category
         );
-        product = productRepository.save(product);
-        return ProductResponseDTO.from(product);
+        return ProductResponseDTO.from(productRepository.save(product));
     }
 
 

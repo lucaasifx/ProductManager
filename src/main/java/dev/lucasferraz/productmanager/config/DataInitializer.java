@@ -1,6 +1,6 @@
 package dev.lucasferraz.productmanager.config;
 
-import dev.lucasferraz.productmanager.models.Category;
+import dev.lucasferraz.productmanager.models.category.Category;
 import dev.lucasferraz.productmanager.repositories.CategoryRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

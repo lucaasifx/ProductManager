@@ -1,7 +1,7 @@
 package dev.lucasferraz.productmanager.models.product;
 
 
-import dev.lucasferraz.productmanager.models.Category;
+import dev.lucasferraz.productmanager.models.category.Category;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
