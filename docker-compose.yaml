@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: product_manager_db
+    restart: always
+    environment:
+      POSTGRES_DB: product_manager
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Admin@123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  postgres_data:
