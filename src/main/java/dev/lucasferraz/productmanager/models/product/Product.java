@@ -39,6 +39,9 @@ public class Product {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -47,21 +50,32 @@ public class Product {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
-    public Product(String name, String description, BigDecimal price, int stockQuantity, Category category) {
+    public Product(String name, String description, BigDecimal price, int stockQuantity, Category category, String imageUrl) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.stockQuantity = stockQuantity;
         this.category = category;
+        this.imageUrl = imageUrl;
     }
 
-    public void updateDetails(String name, String description, Category category) {
+    public Product(String name, String description, BigDecimal price, int stockQuantity, Category category) {
+        this(name, description, price, stockQuantity, category, null);
+    }
+
+    public void updateDetails(String name, String description, Category category, String imageUrl) {
         if (name != null && !name.isBlank())
             this.name = name;
         if (description != null)
             this.description = description;
         if (category != null)
             this.category = category;
+        if (imageUrl != null && !imageUrl.isBlank())
+            this.imageUrl = imageUrl;
+    }
+
+    public void updateDetails(String name, String description, Category category) {
+        updateDetails(name, description, category, null);
     }
 
     public void updatePrice(BigDecimal newPrice) {

@@ -21,7 +21,9 @@ public record ProductRequestDTO(
         int stockQuantity,
 
         @NotNull(message = "Id da categoria não pode ser nulo")
-        Long categoryId
+        Long categoryId,
+
+        String imageUrl
         ) {
 
 }

@@ -52,7 +52,8 @@ public class ProductService {
                 productRequestDTO.description(),
                 productRequestDTO.price(),
                 productRequestDTO.stockQuantity(),
-                category
+                category,
+                productRequestDTO.imageUrl()
         );
         return ProductResponseDTO.from(productRepository.save(product));
     }
@@ -76,7 +77,8 @@ public class ProductService {
         product.updateDetails(
                 productRequestDTO.name(),
                 productRequestDTO.description(),
-                category
+                category,
+                productRequestDTO.imageUrl()
         );
 
         return ProductResponseDTO.from(product);

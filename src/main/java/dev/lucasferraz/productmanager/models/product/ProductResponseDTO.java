@@ -8,7 +8,8 @@ public record ProductResponseDTO(UUID id,
                                  Long categoryId,
                                  BigDecimal price,
                                  String description,
-                                 int stockQuantity) {
+                                 int stockQuantity,
+                                 String imageUrl) {
 
     public static ProductResponseDTO from(Product product) {
         return new ProductResponseDTO(
@@ -17,7 +18,8 @@ public record ProductResponseDTO(UUID id,
                 product.getCategory().getId(),
                 product.getPrice(),
                 product.getDescription(),
-                product.getStockQuantity()
+                product.getStockQuantity(),
+                product.getImageUrl()
         );
     }
 }
