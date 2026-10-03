@@ -36,4 +36,12 @@ public class Category {
         this.active = active;
     }
 
+    public void updateDetails(String name, String description, Boolean active) {
+        if (name != null && !name.isBlank())
+            this.name = name;
+        if (description != null)
+            this.description = description;
+        if (active != null)
+            this.active = active;
+    }
 }

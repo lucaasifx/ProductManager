@@ -9,8 +9,9 @@ import dev.lucasferraz.productmanager.models.product.ProductResponseDTO;
 import dev.lucasferraz.productmanager.repositories.CategoryRepository;
 import dev.lucasferraz.productmanager.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,8 +25,7 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
-
-
+    @Transactional(readOnly = true)
     public ProductResponseDTO getProductById(UUID id) {
         Product product = productRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(String.format("Produto com id %s not found", id))
@@ -33,16 +33,13 @@ public class ProductService {
         return ProductResponseDTO.from(product);
     }
 
-
+    @Transactional(readOnly = true)
     public List<ProductResponseDTO> getAllProducts() {
         List<Product> products = productRepository.findAll();
         return products.stream().map(ProductResponseDTO::from).toList();
     }
 
-
-//    Regra de Negócio 1: Buscar a categoria por dto.categoryId(). Se não existir, lançar uma exceção de recurso não encontrado.
-//    Regra de Negócio 2: Se a categoria existir mas category.isActive() == false, lançar uma exceção de regra de negócio (não pode criar produto com categoria inativa).
-//    Persistir o produto e mapear para ProductResponseDTO.
+    @Transactional
     public ProductResponseDTO addProduct(ProductRequestDTO productRequestDTO) {
         Category category = categoryRepository.findById(productRequestDTO.categoryId()).orElseThrow(
                 () -> new ResourceNotFoundException(String.format("Categoria com id %s não encontrada", productRequestDTO.categoryId()))
@@ -60,37 +57,54 @@ public class ProductService {
         return ProductResponseDTO.from(productRepository.save(product));
     }
 
-
+    @Transactional
     public ProductResponseDTO updateProduct(UUID id, ProductRequestDTO productRequestDTO) {
         Product product = productRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(String.format("Produto com id %s não encontrado", id))
         );
-        product = Product.builder()
-                .id(id)
-                .name(productRequestDTO.name()!= null ? productRequestDTO.name() : product.getName())
-                .description(productRequestDTO.description() != null ? productRequestDTO.description() : product.getDescription())
-                .price(productRequestDTO.price() != null ? productRequestDTO.price() : product.getPrice())
-                // nao é permitido atualizar o estoque nessa rota
-                .stockQuantity(product.getStockQuantity())
-                .category(product.getCategory())
-                .createdAt(product.getCreatedAt())
-                // atualiza o estado do update
-                .updatedAt(Instant.now())
-                .build();
-        product = productRepository.save(product);
+
+        Category category = null;
+        if (productRequestDTO.categoryId() != null) {
+            category = categoryRepository.findById(productRequestDTO.categoryId()).orElseThrow(
+                    () -> new ResourceNotFoundException(String.format("Categoria com id %s não encontrada", productRequestDTO.categoryId()))
+            );
+            if (!category.isActive()) {
+                throw new BusinessRuleException(String.format("Não é possível associar o produto à categoria %s pois ela está inativa.", category.getName()));
+            }
+        }
+
+        product.updateDetails(
+                productRequestDTO.name(),
+                productRequestDTO.description(),
+                category
+        );
+
         return ProductResponseDTO.from(product);
     }
 
+    @Transactional
+    public ProductResponseDTO updateProductPrice(UUID id, BigDecimal newPrice) {
+        Product product = productRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("Produto com id %s não encontrado", id))
+        );
+        product.updatePrice(newPrice);
+        return ProductResponseDTO.from(product);
+    }
 
+    @Transactional
+    public ProductResponseDTO updateProductStock(UUID id, int newQuantity) {
+        Product product = productRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("Produto com id %s não encontrado", id))
+        );
+        product.updateStock(newQuantity);
+        return ProductResponseDTO.from(product);
+    }
+
+    @Transactional
     public void deleteProduct(UUID id) {
         Product product = productRepository.findById(id).orElseThrow(
-            () -> new ResourceNotFoundException(String.format("Produto com id %s não encontrado", id))
+                () -> new ResourceNotFoundException(String.format("Produto com id %s não encontrado", id))
         );
         productRepository.delete(product);
     }
-
-
-
-
-
 }

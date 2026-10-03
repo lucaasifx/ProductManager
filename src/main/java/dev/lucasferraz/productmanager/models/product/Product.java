@@ -1,6 +1,7 @@
 package dev.lucasferraz.productmanager.models.product;
 
 
+import dev.lucasferraz.productmanager.exceptions.BusinessRuleException;
 import dev.lucasferraz.productmanager.models.category.Category;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -54,4 +55,24 @@ public class Product {
         this.category = category;
     }
 
+    public void updateDetails(String name, String description, Category category) {
+        if (name != null && !name.isBlank())
+            this.name = name;
+        if (description != null)
+            this.description = description;
+        if (category != null)
+            this.category = category;
+    }
+
+    public void updatePrice(BigDecimal newPrice) {
+        if (newPrice == null || newPrice.compareTo(BigDecimal.ZERO) <= 0)
+            throw new BusinessRuleException("O preço do produto deve ser maior que zero.");
+        this.price = newPrice;
+    }
+
+    public void updateStock(int newQuantity) {
+        if (newQuantity < 0)
+            throw new BusinessRuleException("A quantidade em estoque não pode ser negativa.");
+        this.stockQuantity = newQuantity;
+    }
 }

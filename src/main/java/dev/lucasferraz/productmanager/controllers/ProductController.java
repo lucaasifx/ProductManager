@@ -1,7 +1,9 @@
 package dev.lucasferraz.productmanager.controllers;
 
+import dev.lucasferraz.productmanager.models.product.ProductPriceUpdateDTO;
 import dev.lucasferraz.productmanager.models.product.ProductRequestDTO;
 import dev.lucasferraz.productmanager.models.product.ProductResponseDTO;
+import dev.lucasferraz.productmanager.models.product.ProductStockUpdateDTO;
 import dev.lucasferraz.productmanager.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -54,7 +56,7 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.addProduct(productRequestDTO));
     }
 
-    @Operation(summary = "Atualiza um produto existente", description = "Atualiza nome, descrição, preço e categoria. Protege a quantidade em estoque contra alteração indevida.")
+    @Operation(summary = "Atualiza dados cadastrais de um produto", description = "Atualiza nome, descrição e categoria. Preço e estoque são protegidos contra alteração indevida e possuem endpoints PATCH dedicados.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Produto atualizado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos"),
@@ -66,6 +68,32 @@ public class ProductController {
                                                             @Valid @RequestBody ProductRequestDTO productRequestDTO) {
         ProductResponseDTO productResponseDTO = productService.updateProduct(id, productRequestDTO);
         return ResponseEntity.ok(productResponseDTO);
+    }
+
+    @Operation(summary = "Atualiza o preço de um produto", description = "Endpoint exclusivo para reajuste de preço. Requer valor maior que zero.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Preço atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos"),
+            @ApiResponse(responseCode = "404", description = "Produto não encontrado"),
+            @ApiResponse(responseCode = "422", description = "Violação de regra de negócio: preço deve ser positivo")
+    })
+    @PatchMapping("/{id}/price")
+    public ResponseEntity<ProductResponseDTO> updateProductPrice(@PathVariable UUID id,
+                                                                 @Valid @RequestBody ProductPriceUpdateDTO priceDto) {
+        return ResponseEntity.ok(productService.updateProductPrice(id, priceDto.price()));
+    }
+
+    @Operation(summary = "Atualiza o estoque de um produto", description = "Endpoint exclusivo para movimentação e ajuste de estoque. Impede valores negativos.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Estoque atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos"),
+            @ApiResponse(responseCode = "404", description = "Produto não encontrado"),
+            @ApiResponse(responseCode = "422", description = "Violação de regra de negócio: estoque não pode ser negativo")
+    })
+    @PatchMapping("/{id}/stock")
+    public ResponseEntity<ProductResponseDTO> updateProductStock(@PathVariable UUID id,
+                                                                 @Valid @RequestBody ProductStockUpdateDTO quantityDto) {
+        return ResponseEntity.ok(productService.updateProductStock(id, quantityDto.quantity()));
     }
 
     @Operation(summary = "Remove um produto", description = "Exclui permanentemente o produto correspondente ao UUID informado")
